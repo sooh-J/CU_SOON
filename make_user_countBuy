@@ -1,0 +1,16 @@
+import pandas as pd
+import numpy as np
+
+df_sales_result = pd.read_csv("df_sales_result.csv")
+
+# User들 id모음 -> list_idUser
+list_idUSer = list(set(df_sales_result['idUser']))
+
+# 각 id당 몇번 샀는지 그 횟수의 리스트 -> list_countBuy  (list_idUser과 index가 같음)
+list_countBuy=[]
+for id_U in list_idUSer:
+    list_countBuy.append(len(df_sales_result[df_sales_result['idUser']==id_U]))
+
+# df_info_User라는 Dataframe에 열 'idUser','countBuy' 두개를 만들고, 순서대로 id, 몇 번 샀는지 횟수를 담기
+df_info_User = pd.DataFrame(np.array([list_idUSer,list_countBuy]).T, columns=['idUser','countBuy'])
+df_info_User.to_csv("cvs_user_countBuy.csv")
