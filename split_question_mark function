@@ -1,0 +1,20 @@
+# split_question_mark
+def split_question_mark(df):
+    val_list=[]
+    df_split = df.copy(deep=True)
+    for index, row in df_items.iterrows():
+        # df_split columns을 반대로 돌며 실행. 그 column의 이름은 col, 그 column이 뒤에서 부터 몇번째인지는 inv_i_col.
+        for inv_i_col, col in enumerate(list(reversed(list(df_split.columns)[0:-1]))): 
+            val = row[col] # row 행의 col 열에 있는 값은 val
+            if "?" in str(val):  # 만약 row 행의 col 열에 ?값이 있다면 split 해준 후 하나씩 뒤로 밀기.
+                val_list.append(val)
+                # print(val)
+                # inv_i_col은 뒤에서부터 몇번째 열인지. i_col은 앞에서부터 몇번째 열인지
+                i_col = int(len(df_split.columns)-inv_i_col-2) 
+                split_res = str(val).split("?") #split
+                if inv_i_col==0:  #마지막에서 두번째 열에 ?로 합쳐져있다면 뒤로 밀지는 않고, 잘라서 두개로 나누기만.
+                    df_split.iloc[index, i_col:i_col+2] = split_res
+                    break
+                df_split.iloc[index, i_col +2 : len(df_split.columns)] = df_split.iloc[index, i_col+1 : -1]  # 하나씩 밀기
+                df_split.iloc[index, i_col:i_col+2] = split_res # 잘라서 지금, 그 다음 행에 넣기
+    return df_split
