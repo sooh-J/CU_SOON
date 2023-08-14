@@ -1,4 +1,4 @@
-df_sales = pd.read_csv("C4_편의점/cvs_sales.csv")
+df_sales = pd.read_csv("C4_편의점/result.csv")
 
 df_sales['idPOS_User'] = df_sales['idPOS'].str.split('-').str[0]
 # df_sales[df_sales['idUser']!=df_sales['idPOS_User']]
