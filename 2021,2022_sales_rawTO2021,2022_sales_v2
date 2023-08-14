@@ -1,5 +1,5 @@
-df_2021_sales_raw = pd.read_csv("../cvs_data/data_result/2021_sales_raw.csv")
-df_2022_sales_raw = pd.read_csv("../cvs_data/data_result/2022_sales_raw.csv")
+df_2021_sales_raw = pd.read_csv("cvs_data/data_result/2021_sales_raw_v2.csv")
+df_2022_sales_raw = pd.read_csv("cvs_data/data_result/2022_sales_raw_v2.csv")
 
 # SalesDT에서 날짜 값 -> SalesDate   # 2021-05-31
 #            년도 값 -> SalesYear   # 2021
@@ -45,5 +45,5 @@ df_2022_sales_raw = df_2022_sales_raw[['idUser', 'idPOS', \
 display(df_2021_sales_raw.iloc[:5,:])
 display(df_2022_sales_raw.iloc[:5,:])
 
-df_2021_sales_raw.to_csv("../cvs_data/data_result/2021_sales_v1.csv", index=False)
-df_2022_sales_raw.to_csv("../cvs_data/data_result/2022_sales_v1.csv", index=False)
+df_2021_sales_raw.to_csv("cvs_data/data_result/2021_sales_v2.csv", index=False)
+df_2022_sales_raw.to_csv("cvs_data/data_result/2022_sales_v2.csv", index=False)
