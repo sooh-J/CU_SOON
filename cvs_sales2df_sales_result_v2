@@ -1,0 +1,45 @@
+df_sales = pd.read_csv("C4_편의점/cvs_sales.csv")
+
+df_sales['idPOS_User'] = df_sales['idPOS'].str.split('-').str[0]
+# df_sales[df_sales['idUser']!=df_sales['idPOS_User']]
+
+## 없다.
+
+df_sales['idPOS'] = df_sales['idPOS'].str.split('-').str[1]+'-'+df_sales['idPOS'].str.split('-').str[2]
+
+df_sales['SalesDT_Date'] = df_sales['SalesDT'].str.split(' ').str[0]
+# 달이 1~9월일 경우(한자리 수의 달일 경우) ex ( 8/09) 098 -> SalesDT_M(달) '098'[2:3]='8', SalesDT_D(일) '098'[0:2]='09'
+idx_JtoS = df_sales[df_sales['SalesDT_Date'].str.len()==7].index #그러한 달의 index
+
+# 달이 10~12월일 경우(두자리 수의 달일경우) ex (10/30) 3010 -> -> SalesDT_M(달) '3010'[2:4]='10', SalesDT_D(일) '3010'[0:2]='30'
+idx_OtoD = df_sales[df_sales['SalesDT_Date'].str.len()==8].index
+
+df_sales.loc[idx_JtoS,'SalesDT_Date'] = df_sales.loc[idx_JtoS,'SalesDT_Date'].str[:2]+'0'+\
+                                        df_sales.loc[idx_JtoS,'SalesDT_Date'].str[2:]
+
+df_sales.loc[idx_JtoS,'SalesDT'] = df_sales.loc[idx_JtoS,'SalesDT'].str[:2]+'0'+\
+                                    df_sales.loc[idx_JtoS,'SalesDT'].str[2:]
+
+idx_time_0to9 = df_sales[df_sales['SalesDT'].str.len()==19].index
+df_sales.loc[idx_time_0to9,'SalesDT'] = df_sales[df_sales['SalesDT'].str.len()==19]['SalesDT'].str[:12]+'0'+\
+                                                        df_sales[df_sales['SalesDT'].str.len()==19]['SalesDT'].str[12:]
+
+idx_time_pm = df_sales[df_sales['SalesDT'].str.split(' ').str[1] == '오후'].index
+idx_time_am = df_sales[df_sales['SalesDT'].str.split(' ').str[1] == '오전'].index
+idx_time_am00 = df_sales[df_sales['SalesDT'].str.contains('오전 12')].index
+
+df_sales.loc[idx_time_am,'SalesDT'] = df_sales.loc[idx_time_am,'SalesDT'].str[:9] + \
+                                        (df_sales.loc[idx_time_am,'SalesDT'].str[12:14].astype(int) + 12).astype(str) + \
+                                        df_sales.loc[idx_time_am,'SalesDT'].str[14:]
+
+df_sales.loc[idx_time_pm,'SalesDT'] = df_sales.loc[idx_time_pm,'SalesDT'].str[:9] + \
+                                        df_sales.loc[idx_time_pm,'SalesDT'].str[12:]
+
+df_sales.loc[idx_time_am00,'SalesDT'] = df_sales.loc[idx_time_am00,'SalesDT'].str[:9] +'00' +\
+                                        df_sales.loc[idx_time_am00,'SalesDT'].str[11:]
+
+df_sales.loc[:,'SalesDT_Date'] = pd.to_datetime(df_sales.loc[:,'SalesDT_Date'], format='%d%m%Y', errors='coerce')
+df_sales.loc[:,'SalesDate'] = pd.to_datetime(df_sales.loc[:,'SalesDate'], format='%Y-%m-%d', errors='coerce')
+df_sales.loc[:,'SalesDT'] = pd.to_datetime(df_sales.loc[:,'SalesDT'], format='%d%m%Y %H:%M:%S', errors='coerce')
+
+df_sales.iloc[:,:-2].to_csv("df_sales_result.csv", index=False)
