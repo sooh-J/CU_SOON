@@ -1,0 +1,58 @@
+df_sales_raw = pd.read_csv("cvs_data/df_sales_result_v2.csv")
+df_users_raw = pd.read_csv('cvs_data/cvs_users.csv',encoding = 'cp949')
+df_sales_raw["SalesDate"] = pd.to_datetime(df_sales_raw['SalesDate'])
+df_sales_raw["SalesDT"] = pd.to_datetime(df_sales_raw['SalesDT'])
+
+visit_counts = df_sales_raw.groupby(["idUser", "SalesDT"]).size().groupby("idUser").size().rename("VisitCount")
+df_users = df_users_raw.merge(visit_counts, left_on="idUser", right_index=True, how="left")
+df_users.rename(columns={"idUser_x": "idUser"}, inplace=True)
+total_prices = df_sales_raw.groupby("idUser")["Price"].sum()
+df_users["TotalPrice"] = df_users["idUser"].map(total_prices)
+# display(df_users)
+
+df_users.dropna(subset=['VisitCount'], inplace=True)
+df_users.reset_index(drop=True, inplace=True)
+# display(df_users.info())
+df_mean_price = df_users.groupby(["Gender", "AgeGroup"])["TotalPrice"].mean().reset_index()
+
+# 년도 정보에서 연도만 추출하여 새로운 열('Year')을 생성합니다.
+df_users['Year'] = df_sales_raw['SalesDate'].apply(lambda date: date.year)
+
+# 연도별 총 매출액을 계산합니다.
+df_yearly_sales = df_users.groupby(['Gender', 'AgeGroup', 'Year'])['TotalPrice'].sum().reset_index()
+
+# 남성과 여성, 연령대별로 2021년과 2022년의 총 매출액을 추출합니다.
+df_2021_sales = df_yearly_sales[(df_yearly_sales['Year'] == 2021)].groupby(['Gender', 'AgeGroup'])['TotalPrice'].sum().reset_index()
+df_2022_sales = df_yearly_sales[(df_yearly_sales['Year'] == 2022)].groupby(['Gender', 'AgeGroup'])['TotalPrice'].sum().reset_index()
+
+
+df_sales_raw['Year'] = df_sales_raw['SalesDate'].apply(lambda date: date.year)
+
+df_yearly_sales = df_users.groupby([ 'AgeGroup', 'Year'])['Gender'].count().reset_index()
+
+df_2021_sales = df_yearly_sales[(df_yearly_sales['Year'] == 2021)].groupby([ 'AgeGroup'])['Gender'].sum().reset_index()
+df_2022_sales = df_yearly_sales[(df_yearly_sales['Year'] == 2022)].groupby(['AgeGroup'])['Gender'].sum().reset_index()
+
+
+# 년도 정보에서 연도만 추출하여 새로운 열('Year')을 생성합니다.
+df_users['Year'] = df_sales_raw['SalesDate'].apply(lambda date: date.year)
+
+# 연도별 총 매출액을 계산합니다.
+df_yearly_sales = df_users.groupby(['Gender', 'AgeGroup', 'Year'])['TotalPrice'].sum().reset_index()
+
+# 남성과 여성, 연령대별로 2021년과 2022년의 총 매출액을 추출합니다.
+df_2021_sales = df_yearly_sales[(df_yearly_sales['Year'] == 2021)]
+df_2022_sales = df_yearly_sales[(df_yearly_sales['Year'] == 2022)]
+
+df_2021_sales_raw = []
+df_2022_sales_raw = []
+
+df_2021_sales_raw = df_sales_raw[df_sales_raw['Year'] == 2021]
+df_2022_sales_raw = df_sales_raw[df_sales_raw['Year'] == 2022]
+
+
+display(df_2021_sales_raw)
+display(df_2022_sales_raw)
+
+df_2021_sales_raw.to_csv("cvs_data/data_result/2021_sales_raw_v2.csv")
+df_2022_sales_raw.to_csv("cvs_data/data_result/2022_sales_raw_v2.csv")
