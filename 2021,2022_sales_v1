@@ -1,0 +1,49 @@
+df_2021_sales_raw = pd.read_csv("../cvs_data/data_result/2021_sales_raw.csv")
+df_2022_sales_raw = pd.read_csv("../cvs_data/data_result/2022_sales_raw.csv")
+
+# SalesDT에서 날짜 값 -> SalesDate   # 2021-05-31
+#            년도 값 -> SalesYear   # 2021
+#            월 값 -> SalesMonth   #   5
+#            일 값 -> SalesDay   # 31
+#            요일 값 -> SalesWeekday   # 0:mon, 1:tue, ... , 6:sun
+#            시간 값을 뽑아 SalesTime에 대입.
+
+df_2021_sales_raw['SalesDate'] = pd.to_datetime(df_2021_sales_raw['SalesDT'].str[:10])
+df_2021_sales_raw['SalesYear'] = df_2021_sales_raw['SalesDate'].dt.year
+df_2021_sales_raw['SalesMonth'] = df_2021_sales_raw['SalesDate'].dt.month
+df_2021_sales_raw['SalesDay'] = df_2021_sales_raw['SalesDate'].dt.day
+df_2021_sales_raw['SalesWeekday'] = df_2021_sales_raw['SalesDate'].dt.weekday
+df_2021_sales_raw['SalesTime'] = pd.to_datetime(df_2021_sales_raw['SalesDT'].str[11:]).dt.time
+
+df_2022_sales_raw['SalesDate'] = pd.to_datetime(df_2022_sales_raw['SalesDT'].str[:10])
+df_2022_sales_raw['SalesYear'] = df_2022_sales_raw['SalesDate'].dt.year
+df_2022_sales_raw['SalesMonth'] = df_2022_sales_raw['SalesDate'].dt.month
+df_2022_sales_raw['SalesDay'] = df_2022_sales_raw['SalesDate'].dt.day
+df_2022_sales_raw['SalesWeekday'] = df_2022_sales_raw['SalesDate'].dt.weekday
+df_2022_sales_raw['SalesTime'] = pd.to_datetime(df_2022_sales_raw['SalesDT'].str[11:]).dt.time
+
+df_2021_sales_raw = df_2021_sales_raw.drop(columns=['SalesDT','ImageUrl','Item_CatORMaker','Year'])
+df_2022_sales_raw = df_2022_sales_raw.drop(columns=['SalesDT','ImageUrl','Item_CatORMaker','Year'])
+
+# idPOS 값은 POS2022-10267 꼴로 되어있음.
+# 앞의 POS2022-를 지우고 뒤의 integer 값만 남기기.
+df_2021_sales_raw['idPOS'] = df_2021_sales_raw['idPOS'].str[8:].astype(int)
+df_2022_sales_raw['idPOS'] = df_2022_sales_raw['idPOS'].str[8:].astype(int)
+
+## 
+df_2021_sales_raw = df_2021_sales_raw[['idUser', 'idPOS', \
+                     'SalesDate', 'SalesYear', 'SalesMonth', 'SalesDay', 'SalesWeekday', 'SalesTime',\
+                     'Gender', 'AgeGroup', 'ItemId', \
+                     'ItemIdLarge', 'ItemNameLarge', 'ItemIdMiddle',\
+                     'ItemNameMiddle', 'ItemName', 'Price']]
+df_2022_sales_raw = df_2022_sales_raw[['idUser', 'idPOS', \
+                     'SalesDate', 'SalesYear', 'SalesMonth', 'SalesDay', 'SalesWeekday', 'SalesTime',\
+                     'Gender', 'AgeGroup', 'ItemId',  \
+                     'ItemIdLarge', 'ItemNameLarge', 'ItemIdMiddle',\
+                     'ItemNameMiddle', 'ItemName', 'Price']]
+
+display(df_2021_sales_raw.iloc[:5,:])
+display(df_2022_sales_raw.iloc[:5,:])
+
+df_2021_sales_raw.to_csv("../cvs_data/data_result/2021_sales_v1.csv", index=False)
+df_2022_sales_raw.to_csv("../cvs_data/data_result/2022_sales_v1.csv", index=False)
